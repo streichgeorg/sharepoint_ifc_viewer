@@ -1,0 +1,22 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.20.4",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.24.0"
+    },
+    "version": "1.20.0",
+    "libraryName": "xeokit-sharepoint",
+    "libraryId": "46e027bc-c10b-4ef3-95db-8a1e5b6518ba",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "xeokit-sharepoint",
+    "solutionShortDescription": "xeokit-sharepoint description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "ListViewCommandSet"
+  }
+}

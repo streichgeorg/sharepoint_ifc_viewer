@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "xeokit-viewer-command-set": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/xeokitViewer/XeokitViewerCommandSet.js",
+          "manifest": "./src/extensions/xeokitViewer/XeokitViewerCommandSet.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "XeokitViewerCommandSetStrings": "lib/extensions/xeokitViewer/loc/{locale}.js"
+  }
+}
