@@ -11,18 +11,24 @@
     height: 100%;
 }
 
+.sectionPlaneCanvas {
+    position: absolute;
+    bottom: 2em;
+    right: 2em;
+    width: 25vw;
+    height: 25vw;
+    z-index: 1000000;
+}
+
 .treeViewContainer {
-    width: 20%;
+    width: max(20%, 350px);
     height: 100%;
     position: absolute;
     left: 0;
     top: 0;
-}
-
-.treeViewContainer {
     pointer-events: all;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
     background-color: rgba(255, 255, 255, 0.2);
@@ -150,20 +156,10 @@
     visibility: visible;
 }
 
-.sectionPlaneCanvas {
-    position: absolute;
-    bottom: 2em;
-    right: 2em;
-    width: 25vw;
-    height: 25vw;
-    z-index: 1000000;
-}
-
-.xeokit-context-menu {
-    font-family: 'Roboto', sans-serif;
+:global(.xeokit-context-menu) {
     font-size: 15px;
     display: none;
-    z-index: 300000;
+    z-index: 10000000 !important;
     background: rgba(255, 255, 255, 0.46);
     border: 1px solid black;
     border-radius: 6px;
@@ -171,13 +167,13 @@
     width: 200px;
 }
 
-.xeokit-context-menu ul {
+:global(.xeokit-context-menu) ul {
     list-style: none;
     margin-left: 0;
     padding: 0;
 }
 
-.xeokit-context-menu-item {
+:global(.xeokit-context-menu-item) {
     list-style-type: none;
     padding-left: 10px;
     padding-right: 20px;
@@ -189,31 +185,31 @@
     width: calc(100% - 30px);
 }
 
-.xeokit-context-menu-item:hover {
+:global(.xeokit-context-menu-item):hover {
     background: black;
     color: white;
     font-weight: normal;
 }
 
-.xeokit-context-menu-item span {
+:global(.xeokit-context-menu-item) span {
     display: inline-block;
 }
 
-.xeokit-context-menu .disabled {
+:global(.xeokit-context-menu) .disabled {
     display: inline-block;
     color: gray;
     cursor: default;
     font-weight: normal;
 }
 
-.xeokit-context-menu .disabled:hover {
+:global(.xeokit-context-menu) .disabled:hover {
     color: gray;
     cursor: default;
     background: #eeeeee;
     font-weight: normal;
 }
 
-.xeokit-context-menu-item-separator {
+:global(.xeokit-context-menu-item-separator) {
     background: rgba(0, 0, 0, 1);
     height: 1px;
     width: 100%;
