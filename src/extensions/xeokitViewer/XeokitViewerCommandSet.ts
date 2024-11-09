@@ -37,6 +37,7 @@ class ViewerDialog extends BaseDialog {
   private sceneModel: object;
   private modelPath: string;
 
+  private viewer: any;
   private canvasContextMenu: any;
   private objectContextMenu: any;
 
@@ -60,8 +61,6 @@ class ViewerDialog extends BaseDialog {
           <li>Right Arrow: Pan camera right</li>
           <li>Up Arrow: Move camera forwards</li>
           <li>Down Arrow: Move camera backwards</li>
-          <li>U: Pan camera up</li>
-          <li>D: Pan camera down</li>
         </ul>
         
         <h3>Preset Views:</h3>
@@ -80,8 +79,6 @@ class ViewerDialog extends BaseDialog {
     keyMap[cameraControl.PAN_RIGHT] = [input.KEY_RIGHT_ARROW];
     keyMap[cameraControl.DOLLY_FORWARDS] = [input.KEY_UP_ARROW];
     keyMap[cameraControl.DOLLY_BACKWARDS] = [input.KEY_DOWN_ARROW];
-    keyMap[cameraControl.PAN_UP] = [input.KEY_U];
-    keyMap[cameraControl.PAN_DOWN] = [input.KEY_D];
     keyMap[cameraControl.AXIS_VIEW_RIGHT] = [input.KEY_NUM_1];
     keyMap[cameraControl.AXIS_VIEW_BACK] = [input.KEY_NUM_2];
     keyMap[cameraControl.AXIS_VIEW_LEFT] = [input.KEY_NUM_3];
@@ -96,13 +93,15 @@ class ViewerDialog extends BaseDialog {
     Log.info(LOG_SOURCE, 'Initializing Viewer');
 
     const canvas = this.domElement.querySelector("#viewerCanvas")!;
+
     const viewer = new Viewer({
       canvasElement: canvas,
       transparent: true,
       numCachedSectionPlanes: 4
     });
+    this.viewer = viewer;
 
-    const cameraControl = viewer.cameraControl;
+    const cameraControl = this.viewer.cameraControl;
     cameraControl.navMode = "orbit";
     cameraControl.followPointer = true;
     const {keyMap, helpText} = this.getKeyMap(cameraControl, viewer.scene.input);
@@ -117,12 +116,16 @@ class ViewerDialog extends BaseDialog {
         hierarchy: "containment"
     });
 
+    Log.info(LOG_SOURCE, `TreeView initialized: ${treeView}`);
+
     const sectionPlanes = new (SectionPlanesPlugin as any)(viewer, {
       overviewCanvasId: this.domElement.querySelector("#sectionPlaneCanvas")!.id,
       overviewVisible: true
     });
 
-    this.canvasContextMenu = new ContextMenu({
+    Log.info(LOG_SOURCE, `SectionPlanes initialized: ${sectionPlanes}`);
+
+    const canvasContextMenu = new ContextMenu({
       enabled: true,
       context: {
         viewer: viewer
@@ -164,8 +167,9 @@ class ViewerDialog extends BaseDialog {
         ]
       ]
     });
+    this.canvasContextMenu = canvasContextMenu;
 
-    this.objectContextMenu = new ContextMenu({
+    const objectContextMenu = new ContextMenu({
       items: [
         [
           {
@@ -258,38 +262,9 @@ class ViewerDialog extends BaseDialog {
         ],
         [
           {
-            title: "Select",
-            getEnabled: function (context) {
-              return (!context.entity.selected);
-            },
-            doAction: function (context) {
-              context.entity.selected = true;
-            }
-          },
-          {
-            title: "Undo select",
-            getEnabled: function (context) {
-              return context.entity.selected;
-            },
-            doAction: function (context) {
-              context.entity.selected = false;
-            }
-          },
-          {
-            title: "Clear Selection",
-            getEnabled: function (context) {
-              return (context.viewer.scene.numSelectedObjects > 0);
-            },
-            doAction: function (context) {
-              context.viewer.scene.setObjectsSelected(context.viewer.scene.selectedObjectIds, false);
-            }
-          }
-        ],
-        [
-          {
             title: "Create Section Plane",
             doAction: function (context) {
-              const pickResult = viewer.scene.pick({
+              const pickResult = context.viewer.scene.pick({
                 canvasPos: context.canvasPos,
                 pickSurface: true  // <<------ This causes picking to find the intersection point on the entity
               });
@@ -347,27 +322,28 @@ class ViewerDialog extends BaseDialog {
       return canvasPos;
     };
 
-    viewer.scene.canvas.canvas.addEventListener('contextmenu', (event) => {
+    viewer.scene.canvas.canvas.addEventListener('contextmenu', function (event) {
       const canvasPos = getCanvasPosFromEvent(event);
       const hit = viewer.scene.pick({
         canvasPos
       });
       if (hit && hit.entity.isObject) {
-        this.objectContextMenu.context = { // Must set context before showing menu
+        objectContextMenu.context = { // Must set context before showing menu
           viewer,
           treeViewPlugin: treeView,
           entity: hit.entity,
           canvasPos,
         };
-        (this.objectContextMenu as any).show(event.pageX, event.pageY);
+        (objectContextMenu as any).show(event.pageX, event.pageY);
       } else {
-        this.canvasContextMenu.context = { // Must set context before showing menu
+        canvasContextMenu.context = { // Must set context before showing menu
           viewer
         };
-        (this.canvasContextMenu as any).show(event.pageX, event.pageY);
+        (canvasContextMenu as any).show(event.pageX, event.pageY);
       }
       event.preventDefault();
     });
+    this.objectContextMenu = objectContextMenu;
 
     Log.info(LOG_SOURCE, 'Initializing WebIFCLoaderPlugin');
 
@@ -414,8 +390,15 @@ class ViewerDialog extends BaseDialog {
   }
 
   public onAfterClose(): void {
-    this.canvasContextMenu.destroy();
-    this.objectContextMenu.destroy();
+    if (this.viewer) {
+      this.viewer.destroy();
+    }
+    if (this.canvasContextMenu) {
+      this.canvasContextMenu.destroy();
+    }
+    if (this.objectContextMenu) {
+      this.objectContextMenu.destroy();
+    }
   }
 }
 
